@@ -39,6 +39,8 @@ so that merging is as easy as possible.
 | `npm run test` | Launch the test runner (jest) in interactive watch mode. (q to quit). |
 | `npm run code-analysis` | Run `standard.js` linter / formatter. |
 | `npm run code-analysis:fix` | Run `standard --fix` script to fix `standard.js` linter and formatting errors. |
+| `npm run code-analysis:client` | Run `standard.js` linter / formatter on client directory only. |
+| `npm run code-analysis:client:fix` | Run `standard --fix` script to fix `standard.js` linter and formatting errors on client directory only. |
 
 ### git Commit Message Formatting:
 | Type | Message |
