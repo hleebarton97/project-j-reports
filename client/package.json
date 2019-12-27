@@ -1,0 +1,55 @@
+{
+  "name": "j-reports",
+  "version": "0.1.0",
+  "private": true,
+  "proxy": "http://localhost:5000",
+  "dependencies": {
+    "bootstrap": "^4.3.1",
+    "react": "^16.9.0",
+    "react-bootstrap": "^1.0.0-beta.12",
+    "react-dom": "^16.9.0",
+    "react-redux": "^7.1.1",
+    "react-router-dom": "^5.0.1",
+    "react-scripts": "3.1.1",
+    "redux": "^4.0.4",
+    "redux-thunk": "^2.3.0"
+  },
+  "scripts": {
+    "start": "npm run code-analysis && npm run test:nowatch && react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "test:nowatch": "set CI=true && react-scripts test --env=jsdom",
+    "code-analysis": "standard",
+    "code-analysis:fix": "standard --fix"
+  },
+  "pre-commit": [
+    "test:nowatch",
+    "code-analysis:fix"
+  ],
+  "standard": {
+    "env": [
+      "jest"
+    ]
+  },
+  "eslintConfig": {
+    "extends": "react-app"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "devDependencies": {
+    "enzyme": "^3.10.0",
+    "enzyme-adapter-react-16": "^1.14.0",
+    "pre-commit": "^1.2.2",
+    "standard": "^14.1.0"
+  }
+}

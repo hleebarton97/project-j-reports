@@ -1,0 +1,22 @@
+/** CUSTOM CSS FOR PADDING OR MARGIN PROBLEMS IN BOOTSTRAP **/
+
+/** CUSTOM SPACING **/
+.margin.bottom.sm { margin-bottom: 5px }
+.margin.bottom.med { margin-bottom: 10px }
+.margin.bottom.lg { margin-bottom: 20px }
+
+.margin.top.lg { margin-top: 20px }
+.margin.top.xlg { margin-top: 30px }
+
+/** HEADER PADDING **/
+.hp.lg { padding-top: 20px }
+.hp.xlg { padding-top: 40px }
+
+/** CUSTOM LOADING ANIMATION OVERLAY **/
+.overlay.loading {
+  z-index: 2;
+  position: fixed; display: flex; left: 0;
+  width: stretch; height: stretch;
+  background-color: #000; opacity: 0.6;
+  justify-content: center; align-items: center;
+}
