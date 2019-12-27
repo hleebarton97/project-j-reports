@@ -5,9 +5,6 @@
 // R E Q U I R E D   /   C U S T O M   I M P O R T S
 /// /////////////////////////////////////////////////
 
-// Required imports
-const path = require('path')
-
 // Custom file imports
 const globals = require('../util/globals.js')
 
@@ -20,7 +17,6 @@ const globals = require('../util/globals.js')
 /// /////////////////////////////////////////////////
 
 module.exports = app => {
-
   /// /////////////////////////////////////////////////
   // D A T A S O U R C E S
   /// /////////////////////////////////////////////////
@@ -60,5 +56,4 @@ module.exports = app => {
     (req, res) => {
       // let groupId = req.params.id
     })
-
 }

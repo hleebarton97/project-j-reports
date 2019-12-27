@@ -7,10 +7,10 @@ const app = express()
 app.use(bodyParser.json())
 
 // API routes
-require('./api/get-routes.js')(app)     // GET
-require('./api/post-routes.js')(app)    // POST
-require('./api/put-routes.js')(app)     // UPDATE
-require('./api/delete-routes.js')(app)  // DELETE
+require('./api/get-routes.js')(app) // GET
+require('./api/post-routes.js')(app) // POST
+require('./api/put-routes.js')(app) // UPDATE
+require('./api/delete-routes.js')(app) // DELETE
 
 // Server
 const PORT = process.env.PORT || 5000
