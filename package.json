@@ -5,13 +5,24 @@
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
-    "server": "nodemon index.js",
+    "server": "npm run codenodemon index.js",
     "client": "npm run start --prefix client",
     "dev": "concurrently \"npm run server\" \"npm run client\"",
     "build": "npm run build --prefix client",
     "test": "npm run test:nowatch --prefix client",
-    "code-anlaysis": "npm run code-analysis --prefix client",
-    "code-analysis:fix": "npm run code-analysis:fix --prefix client"
+    "code-analysis": "standard",
+    "code-analysis:fix": "standard --fix",
+    "code-anlaysis:client": "npm run code-analysis --prefix client",
+    "code-analysis:client:fix": "npm run code-analysis:fix --prefix client"
+  },
+  "pre-commit": [
+    "code-analysis:fix",
+    "test"
+  ],
+  "standard": {
+    "env": [
+      "jest"
+    ]
   },
   "author": "Henry Lee Barton III",
   "license": "ISC",
@@ -21,6 +32,8 @@
   },
   "devDependencies": {
     "concurrently": "^5.0.2",
-    "nodemon": "^1.19.4"
+    "nodemon": "^1.19.4",
+    "pre-commit": "^1.2.2",
+    "standard": "^14.3.1"
   }
 }
