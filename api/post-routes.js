@@ -56,8 +56,6 @@ module.exports = app => {
   // Create a user
   app.post(`${globals.API_URI}/users`,
     (req, res) => {
-      const sql = 'INSERT INTO ' + mysql.SCHEMA + mysql.User +
-       ' (' + mysql.inserts.user + ') VALUES(?,?,?,?)'
     })
 
   /// /////////////////////////////////////////////////

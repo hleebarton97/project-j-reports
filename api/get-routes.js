@@ -31,7 +31,6 @@ module.exports = app => {
 
   // Get a datasource by id
 
-
   /// /////////////////////////////////////////////////
   // U S E R S
   /// /////////////////////////////////////////////////
@@ -45,7 +44,6 @@ module.exports = app => {
   /// /////////////////////////////////////////////////
 
   // Get all reports
-
 
   // Get all reports by user id
   app.get(`${globals.API_URI}/reports/:id`, (req, res) => {
