@@ -7,13 +7,12 @@
 
 // Custom file imports
 const globals = require('../util/globals.js')
-const mysql = require('../util/mysql.js')
 
-// get mysql connection object
+/* // get mysql connection object
 const mySqlDB = mysql.createConnection()
 mySqlDB.connect(err => {
   if (err) { throw err } else { console.log('My SQL Connected.....') }
-})
+}) */
 
 /// /////////////////////////////////////////////////
 // G L O B A L   V A R I A B L E S
@@ -29,118 +28,24 @@ module.exports = app => {
   /// /////////////////////////////////////////////////
 
   // Get all datasources
-  app.get(`${globals.API_URI}/datasources`, (req, res) => {
-    const sql = 'SELECT * FROM ' + mysql.SCHEMA + mysql.Datasource
-    mySqlDB.query(sql, (err, result) => {
-      if (err) { throw err } else {
-        if (result.length > 0) {
-          res.status(200).json({ data: result })
-        } else {
-          res.status(404).json({ data: 'no datsources found' })
-        }
-      }
-    })
-  })
 
   // Get a datasource by id
-  app.get(`${globals.API_URI}/datasources/:id`, (req, res) => {
-    var datasourceID = req.params.id
-    const sql = 'SELECT * FROM ' + mysql.SCHEMA + mysql.Datasource + ' WHERE ID = ?'
-    mySqlDB.query(sql, datasourceID, function (err, result) {
-      if (err) {
-        throw err
-      } else {
-        if (result.length > 0) {
-          var datasourceObj = result[0]
-          res.status(200).json({ data: datasourceObj })
-        } else {
-          res.status(404).json({ data: 'datasource not found' })
-        }
-      }
-    })
-  })
+
 
   /// /////////////////////////////////////////////////
   // U S E R S
   /// /////////////////////////////////////////////////
 
   // Get all users
-  app.get(`${globals.API_URI}/users`, (req, res) => {
-    var userArr = []
-    const sql = 'SELECT * FROM ' + mysql.SCHEMA + mysql.User
-    mySqlDB.query(sql, function (err, result) {
-      if (err) throw err
-      else {
-        if (result.length > 0) {
-          for (var i in result) {
-            userArr.push(
-              {
-                id: result[i].ID,
-                username: result[i].Username,
-                user_type_id: result[i].User_type_id
-              }
-            )
-          }
-          getGroupId(userArr, function (users) {
-            res.status(200).json({ data: userArr })
-          })
-        } else {
-          res.status(404).json({ data: 'no users found' })
-        }
-      }
-    })
-  })
 
   // Get a user by id
-  app.get(`${globals.API_URI}/users/:id`, (req, res) => {
-    var userID = req.params.id
-    const sql = 'SELECT * FROM ' + mysql.SCHEMA + mysql.User + ' WHERE ID = ?'
-    mySqlDB.query(sql, userID, function (err, result) {
-      if (err) {
-        throw err
-      } else {
-        if (result.length > 0) {
-          const sql2 =
-              'SELECT * FROM ' + mysql.SCHEMA + mysql.Usergroup + ' WHERE user_group.user_ID = ?'
-          mySqlDB.query(sql2, userID, function (err, result2) {
-            if (err) throw err
-            else {
-              var groups = []
-              for (var i = 0; i < result2.length; i++) {
-                groups.push(
-                  {
-                    id: result2[i].group_ID,
-                    name: result2[i].group_Name
-                  })
-              }
-              var userObj = {
-                id: result[0].ID,
-                username: result[0].Username,
-                user_type_id: result[0].User_type_id,
-                groups: groups
-              }
-              res.status(200).json({ data: userObj })
-            }
-          })
-        } else {
-          res.status(404).json({ data: 'user not found' })
-        }
-      }
-    })
-  })
 
   /// /////////////////////////////////////////////////
   // R E P O R T S
   /// /////////////////////////////////////////////////
 
   // Get all reports
-  app.get(`${globals.API_URI}/reports`, (req, res) => {
-    const sql = 'SELECT * FROM ' + mysql.SCHEMA + mysql.Report
-    mySqlDB.query(sql, (err, result) => {
-      if (err) { throw err } else {
-      }
-    })
-  })
+
 
   // Get all reports by user id
   app.get(`${globals.API_URI}/reports/:id`, (req, res) => {
@@ -152,51 +57,8 @@ module.exports = app => {
   /// /////////////////////////////////////////////////
 
   // Get all groups
-  app.get(`${globals.API_URI}/groups`, (req, res) => {
-    const sql = 'SELECT * FROM ' + mysql.SCHEMA + mysql.Group
-    mySqlDB.query(sql, (err, result) => {
-      if (err) throw err
-      else {
-        if (result.length > 0) res.status(200).json({ data: result })
-        else res.status(404).json({ data: 'No groups found' })
-      }
-    })
-  })
 
   // Get a group by id
-  app.get(`${globals.API_URI}/groups/:id`, (req, res) => {
-    var groupId = req.params.id
-    const sql = 'SELECT * FROM ' + mysql.SCHEMA + mysql.Group + ' WHERE ID = ?'
-    mySqlDB.query(sql, groupId, (err, result) => {
-      if (err) { throw err } else {
-        if (result.length > 0) res.status(200).json({ data: result })
-        else res.status(404).json({ data: 'Group not found' })
-      }
-    })
-  })
-}
 
-// get all groups for a group of users
-function getGroupId (users, callback) {
-  var pending = users.length
-
-  const sql = 'SELECT * FROM ' + mysql.SCHEMA + mysql.Usergroup + ' WHERE user_group.user_ID = ?'
-  for (let i = 0; i < pending; i++) {
-    mySqlDB.query(sql, [users[i].id], (err, results) => {
-      if (err) { throw err } else {
-        var groups = []
-        for (let j = 0; j < results.length; j++) {
-          var groupsObj = {
-            id: results[j].group_ID,
-            name: results[j].group_Name
-          }
-          groups.push(groupsObj)
-        }
-        users[i].groups = groups
-        if (--pending === 0) {
-          callback(users)
-        }
-      }
-    })
-  }
+  // get all groups for a group of
 }
