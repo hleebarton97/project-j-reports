@@ -26,4 +26,5 @@ yarn-error.log*
 debug.log
 .vscode
 
+# secure db config info
 keys.js

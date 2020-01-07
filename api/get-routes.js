@@ -11,17 +11,16 @@ const globals = require('../util/globals.js')
 // not custom
 const mysql = require('../db/mysql.js')
 
-// get mysql connection object
-const mySqlDB = mysql.createMySQLConnection()
-mySqlDB.connect(err => { if (err) { throw err } else console.log('MySql Connected.......') })
-
 /// /////////////////////////////////////////////////
 // G L O B A L   V A R I A B L E S
 /// /////////////////////////////////////////////////
+const mySqlDB = mysql.createMySQLConnection()
 
 /// /////////////////////////////////////////////////
 // G E T   E N D P O I N T S   D E F I N I T I O N
 /// /////////////////////////////////////////////////
+// get mysql connection object
+mySqlDB.connect(err => { if (err) { throw err } else console.log('MySql Connected.......') })
 
 module.exports = app => {
   /// /////////////////////////////////////////////////
@@ -228,6 +227,8 @@ module.exports = app => {
     })
   })
 }
+
+/// /////////////////////////////// UTILITY FUNCTIONS ///////////////////////////////////////////////
 
 // get all groups for a group of users
 function getGroups (list, type, callback) {
