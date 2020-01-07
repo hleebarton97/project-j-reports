@@ -7,13 +7,13 @@
 
 // Custom file imports
 const globals = require('../util/globals.js')
-const mysql = require('../util/mysql.js')
+
+// not custom
+const mysql = require('../db/mysql.js')
 
 // get mysql connection object
-const mySqlDB = mysql.createConnection()
-mySqlDB.connect(err => {
-  if (err) { throw err } else { console.log('My SQL Connected.....') }
-})
+const mySqlDB = mysql.createMySQLConnection()
+mySqlDB.connect(err => { if (err) { throw err } else console.log('MySql Connected.......') })
 
 /// /////////////////////////////////////////////////
 // G L O B A L   V A R I A B L E S
