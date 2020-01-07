@@ -81,7 +81,7 @@ module.exports = app => {
               }
             )
           }
-          getGroupId(userArr, function (users) {
+          getGroups(userArr, 0, function () {
             res.status(200).json({ data: userArr })
           })
         } else {
@@ -135,16 +135,69 @@ module.exports = app => {
 
   // Get all reports
   app.get(`${globals.API_URI}/reports`, (req, res) => {
+    var reportArr = []
     const sql = 'SELECT * FROM ' + mysql.SCHEMA + mysql.Report
     mySqlDB.query(sql, (err, result) => {
       if (err) { throw err } else {
+        if (result.length > 0) {
+          for (var i in result) {
+            reportArr.push(
+              {
+                id: result[i].ID,
+                title: result[i].Title,
+                desc: result[i].Description,
+                query_string: result[i].Query,
+                datasource_id: result[i].connection_ID,
+                result_metadata: JSON.parse(result[i].Metadata)
+              }
+            )
+          }
+          getGroups(reportArr, 1, function () {
+            res.status(200).json({ data: reportArr })
+          })
+        } else {
+          res.status(404).json({ data: 'no reports found' })
+        }
       }
     })
   })
 
   // Get all reports by user id
   app.get(`${globals.API_URI}/reports/:id`, (req, res) => {
-    // let reportId = req.params.id
+    var reportID = req.params.id
+    const sql = 'SELECT * FROM ' + mysql.SCHEMA + mysql.Report + ' WHERE ID = ?'
+    mySqlDB.query(sql, reportID, (err, result) => {
+      if (err) { throw err } else {
+        if (result.length > 0) {
+          const sql2 =
+              'SELECT * FROM ' + mysql.SCHEMA + mysql.Reportgroup + ' WHERE report_group.report_ID = ?'
+          mySqlDB.query(sql2, reportID, function (err, result2) {
+            if (err) { throw err } else {
+              var groups = []
+              for (var i = 0; i < result2.length; i++) {
+                groups.push(
+                  {
+                    id: result2[i].group_ID,
+                    name: result2[i].group_Name
+                  })
+              }
+              var reportObj = {
+                id: result[0].ID,
+                title: result[0].Title,
+                desc: result[0].Description,
+                query_string: result[0].Query,
+                datasource_id: result[0].connection_ID,
+                result_metadata: JSON.parse(result[0].Metadata),
+                groups: groups
+              }
+              res.status(200).json({ data: reportObj })
+            }
+          })
+        } else {
+          res.status(400).json({ data: 'Report not found' })
+        }
+      }
+    })
   })
 
   /// /////////////////////////////////////////////////
@@ -177,12 +230,19 @@ module.exports = app => {
 }
 
 // get all groups for a group of users
-function getGroupId (users, callback) {
-  var pending = users.length
-
-  const sql = 'SELECT * FROM ' + mysql.SCHEMA + mysql.Usergroup + ' WHERE user_group.user_ID = ?'
+function getGroups (list, type, callback) {
+  var pending = list.length
+  var joinTable, joinCol
+  if (type === 0) {
+    joinTable = mysql.Usergroup
+    joinCol = 'user_ID'
+  } else if (type === 1) {
+    joinTable = mysql.Reportgroup
+    joinCol = 'report_ID'
+  }
+  const sql = 'SELECT * FROM ' + mysql.SCHEMA + joinTable + ' WHERE ' + joinCol + ' = ?'
   for (let i = 0; i < pending; i++) {
-    mySqlDB.query(sql, [users[i].id], (err, results) => {
+    mySqlDB.query(sql, [list[i].id], (err, results) => {
       if (err) { throw err } else {
         var groups = []
         for (let j = 0; j < results.length; j++) {
@@ -192,9 +252,9 @@ function getGroupId (users, callback) {
           }
           groups.push(groupsObj)
         }
-        users[i].groups = groups
+        list[i].groups = groups
         if (--pending === 0) {
-          callback(users)
+          callback(list)
         }
       }
     })

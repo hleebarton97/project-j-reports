@@ -24,7 +24,8 @@ module.exports = {
   Datasource: 'db_connection',
   Report: 'report',
   Group: 'group',
-  Usergroup: 'user_group'
+  Usergroup: 'user_group',
+  Reportgroup: 'report_group'
 }
 
 var inserts = {
