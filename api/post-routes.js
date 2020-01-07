@@ -15,10 +15,12 @@ const mysql = require('../util/mysql.js')
 // G L O B A L   V A R I A B L E S
 /// /////////////////////////////////////////////////
 const mySqlDB = mysql.createMySQLConnection()
-mySqlDB.connect(err => { if (err) { throw err } else console.log('MySql Connected.......') })
+
 /// /////////////////////////////////////////////////
 // G E T   E N D P O I N T S   D E F I N I T I O N
 /// /////////////////////////////////////////////////
+// open mysql connection
+mySqlDB.connect(err => { if (err) { throw err } else console.log('MySql Connected.......') })
 
 module.exports = app => {
   /// /////////////////////////////////////////////////
