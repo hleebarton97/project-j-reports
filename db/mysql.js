@@ -1,8 +1,8 @@
 const mysql = require('mysql')
-const keys = require('../config/keys.js')
+const keyz = require('../config/keyz.js')
 
 function createMySQLConnection () {
-  return mysql.createConnection(keys.dbCreds)
+  return mysql.createConnection(keyz.dbCreds)
   /**
     * you need a key file in the config folder with the following code
     * pertaining to your mysql db

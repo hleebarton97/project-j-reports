@@ -27,4 +27,4 @@ debug.log
 .vscode
 
 # secure db config info
-keys.js
+keyz.js

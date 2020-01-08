@@ -16,11 +16,11 @@ const mysql = require('../db/mysql.js')
 /// /////////////////////////////////////////////////
 const mySqlDB = mysql.createMySQLConnection()
 
+// get mysql connection object
+mySqlDB.connect(err => { if (err) { throw err } else console.log('MySql Connected.......') })
 /// /////////////////////////////////////////////////
 // G E T   E N D P O I N T S   D E F I N I T I O N
 /// /////////////////////////////////////////////////
-// get mysql connection object
-mySqlDB.connect(err => { if (err) { throw err } else console.log('MySql Connected.......') })
 
 module.exports = app => {
   /// /////////////////////////////////////////////////
