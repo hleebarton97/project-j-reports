@@ -9,16 +9,18 @@
 const globals = require('../util/globals.js')
 
 // not custom
-const mysql = require('../util/mysql.js')
+const mysql = require('../db/mysql.js')
 
 /// /////////////////////////////////////////////////
 // G L O B A L   V A R I A B L E S
 /// /////////////////////////////////////////////////
 const mySqlDB = mysql.createMySQLConnection()
-
+const hash = require('js-sha256')
+const crypto = require('crypto')
 /// /////////////////////////////////////////////////
 // G E T   E N D P O I N T S   D E F I N I T I O N
 /// /////////////////////////////////////////////////
+
 // open mysql connection
 mySqlDB.connect(err => { if (err) { throw err } else console.log('MySql Connected.......') })
 
@@ -52,12 +54,51 @@ module.exports = app => {
   // User sign in
   app.post(`${globals.API_URI}/users/login`,
     (req, res) => {
-
+      const reqObj = req.body
+      const sql = 'SELECT * FROM ' + mysql.SCHEMA + mysql.User + ' WHERE user.Username = ?'
+      mySqlDB.query(sql, reqObj.username, function (err, result) {
+        if (err) {
+          throw err
+        } else {
+          if (result.length > 0) {
+            var loginSaltnHash = getHashedLogin(
+              reqObj.password,
+              result[0].Password_salt
+            )
+            var savedPass = result[0].Password
+            var userObj = {
+              id: result[0].ID,
+              user_type_id: result[0].User_type_id
+            }
+            if (loginSaltnHash === savedPass) {
+              res.status(200).json({ data: userObj })
+            } else {
+              res.status(400).json({ error: 'username and/or password invalid' })
+            }
+          } else {
+            res.status(400).json({ error: 'username and/or password invalid' })
+          }
+        }
+      })
     })
 
   // Create a user
   app.post(`${globals.API_URI}/users`,
     (req, res) => {
+      const reqObj = req.body
+      // generate salt
+      var salt = getSalt(20)
+      var hashedPW = getHashedLogin(reqObj.password, salt)
+      var user = [[reqObj.username, hashedPW, salt, reqObj.user_type_id]]
+      const sql =
+     'INSERT into ' + mysql.SCHEMA + mysql.User + '(' + mysql.inserts.user + ') VALUES ?'
+      mySqlDB.query(sql, [user], function (err) {
+        if (err) {
+          throw err
+        } else {
+          res.status(200).json({ data: reqObj })
+        }
+      })
     })
 
   /// /////////////////////////////////////////////////
@@ -124,6 +165,8 @@ module.exports = app => {
     })
 }
 
+/// ////////////////////// UTILITY FUNCTIONS /////////////////////////////
+
 // get all groups for a group of users
 function addGroupsToReport (report, callback) {
   var pending = report.groupID.length
@@ -132,7 +175,7 @@ function addGroupsToReport (report, callback) {
 
   for (let i = 0; i < pending; i++) {
     const sql = 'CALL ' + mysql.SCHEMA + 'addGroupsToReport(' + reportID + ', ' + groupIDs[i] + ');'
-    mySqlDB.query(sql, (err, result) => {
+    mySqlDB.query(sql, (err) => {
       if (err) { /** Need error check possibly for invalid groupID */ } else {
         if (--pending === 0) {
           callback()
@@ -140,4 +183,18 @@ function addGroupsToReport (report, callback) {
       }
     })
   }
+}
+
+// SHA-256 hashing function
+function getHashedLogin (loginAttempt, savedSalt) {
+  // Using SHA-256 hashing algorithm
+  return hash(loginAttempt + savedSalt)
+}
+
+// generate random salt
+function getSalt (length) {
+  return crypto
+    .randomBytes(Math.ceil(length / 2))
+    .toString('ascii') // convert to hexadecimal format
+    .slice(0, length) // return required number of characters
 }
