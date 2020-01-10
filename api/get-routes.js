@@ -162,6 +162,7 @@ module.exports = app => {
   })
 
   // Get all reports by user id
+  /// //
   app.get(`${globals.API_URI}/reports/:id`, (req, res) => {
     var reportID = req.params.id
     const sql = 'SELECT * FROM ' + mysql.SCHEMA + mysql.Report + ' WHERE ID = ?'
@@ -232,7 +233,7 @@ module.exports = app => {
 
 // get all groups for a group of users
 function getGroups (list, type, callback) {
-  var pending = list.length
+  let pending = list.length
   var joinTable, joinCol
   if (type === 0) {
     joinTable = mysql.Usergroup
