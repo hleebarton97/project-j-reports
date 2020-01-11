@@ -7,22 +7,17 @@
 
 // Custom file imports
 const globals = require('../util/globals.js')
-
-// not custom
 const mysql = require('../db/mysql.js')
-
+const queryUtil = require('../util/db-utility.js')
 /// /////////////////////////////////////////////////
 // G L O B A L   V A R I A B L E S
 /// /////////////////////////////////////////////////
-const mySqlDB = mysql.createMySQLConnection()
 
-// get mysql connection object
-mySqlDB.connect(err => { if (err) { throw err } else console.log('MySql Connected.......') })
 /// /////////////////////////////////////////////////
 // G E T   E N D P O I N T S   D E F I N I T I O N
 /// /////////////////////////////////////////////////
 
-module.exports = app => {
+module.exports = (app, mySqlDB) => {
   /// /////////////////////////////////////////////////
   // D A T A S O U R C E S
   /// /////////////////////////////////////////////////
@@ -80,7 +75,7 @@ module.exports = app => {
               }
             )
           }
-          getGroups(userArr, 0, function () {
+          queryUtil.getGroups(mySqlDB, userArr, 0, function () {
             res.status(200).json({ data: userArr })
           })
         } else {
@@ -151,7 +146,7 @@ module.exports = app => {
               }
             )
           }
-          getGroups(reportArr, 1, function () {
+          queryUtil.getGroups(mySqlDB, reportArr, 1, function () {
             res.status(200).json({ data: reportArr })
           })
         } else {
@@ -227,38 +222,4 @@ module.exports = app => {
       }
     })
   })
-}
-
-/// /////////////////////////////// UTILITY FUNCTIONS ///////////////////////////////////////////////
-
-// get all groups for a group of users
-function getGroups (list, type, callback) {
-  let pending = list.length
-  var joinTable, joinCol
-  if (type === 0) {
-    joinTable = mysql.Usergroup
-    joinCol = 'user_ID'
-  } else if (type === 1) {
-    joinTable = mysql.Reportgroup
-    joinCol = 'report_ID'
-  }
-  const sql = 'SELECT * FROM ' + mysql.SCHEMA + joinTable + ' WHERE ' + joinCol + ' = ?'
-  for (let i = 0; i < pending; i++) {
-    mySqlDB.query(sql, [list[i].id], (err, results) => {
-      if (err) { throw err } else {
-        var groups = []
-        for (let j = 0; j < results.length; j++) {
-          var groupsObj = {
-            id: results[j].group_ID,
-            name: results[j].group_Name
-          }
-          groups.push(groupsObj)
-        }
-        list[i].groups = groups
-        if (--pending === 0) {
-          callback(list)
-        }
-      }
-    })
-  }
 }

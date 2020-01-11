@@ -25,15 +25,13 @@ module.exports = {
   Report: 'report',
   Group: 'group',
   Usergroup: 'user_group',
-  Reportgroup: 'report_group'
+  Reportgroup: 'report_group',
+  dbColInserts: {
+    datasource: 'Name, URL, Username, Password',
+    user: 'Username, Password, Password_salt, User_type_id',
+    report: 'Title, Query, Description, Metadata, connection_ID',
+    group: 'Name'
+  }
 }
 
-var dbColInserts = {
-  datasource: 'Name, URL, Username, Password',
-  user: 'Username, Password, Password_salt, User_type_id',
-  report: 'Title, Query, Description, Metadata, connection_ID',
-  group: 'Name'
-}
-
-module.exports.inserts = dbColInserts
 module.exports.createMySQLConnection = createMySQLConnection
