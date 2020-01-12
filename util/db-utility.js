@@ -35,5 +35,25 @@ module.exports = {
         }
       )
     }
+  },
+
+  // get all groups for a group of users
+  addGroupsToReport: (mySqlDB, report, callback) => {
+    var pending = report.groupID.length
+    var reportID = report.id
+    var groupIDs = report.groupID
+
+    for (let i = 0; i < pending; i++) {
+      const sql = 'CALL ' + mysql.SCHEMA + 'addGroupsToReport(' + reportID + ', ' + groupIDs[i] + ');'
+      mySqlDB.query(sql, err => {
+        if (err) {
+          /** Need error check possibly for invalid groupID */
+        } else {
+          if (--pending === 0) {
+            callback()
+          }
+        }
+      })
+    }
   }
 }
