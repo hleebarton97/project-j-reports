@@ -10,6 +10,7 @@ const globals = require('../util/globals.js')
 const mysql = require('../db/mysql.js')
 const queryUtil = require('../util/db-utility.js')
 const security = require('../util/authentication')
+const response = require('../util/responses.js')
 /// /////////////////////////////////////////////////
 // G L O B A L   V A R I A B L E S
 /// /////////////////////////////////////////////////
@@ -29,13 +30,14 @@ module.exports = (app, mySqlDB) => {
       var datasource = [req.body.name, req.body.connection_string, req.body.username, req.body.password]
       var dsObj = req.body
       const sql = 'INSERT INTO ' + mysql.SCHEMA + mysql.Datasource +
-          ' (' + mysql.inserts.datasource + ') VALUES(?,?,?,?)'
+            ' (' + mysql.inserts.datasource + ') VALUES(?,?,?,?)'
       mySqlDB.query(sql, datasource, (err, result) => {
         if (err) { throw err } else {
           if (result.affectedRows > 0) {
             res.status(200).json({ data: dsObj })
           } else {
-            res.status(400).json({ error: 'datasource could not be created' })
+            response.ERROR_RESP400.message = 'could not add datasource to database'
+            res.status(400).json(response.ERROR_RESP400)
           }
         }
       })
@@ -65,34 +67,65 @@ module.exports = (app, mySqlDB) => {
             if (loginSaltnHash === savedPass) {
               res.status(200).json({ data: userObj })
             } else {
-              res.status(400).json({ error: 'username and/or password invalid' })
+              response.ERROR_RESP404.message = 'username and/or password invalid'
+              res.status(400).json(response.ERROR_RESP404)
             }
           } else {
-            res.status(400).json({ error: 'username and/or password invalid' })
+            response.ERROR_RESP404.message = 'username and/or password invalid'
+            res.status(400).json(response.ERROR_RESP404)
           }
         }
       })
     })
 
-  // Create a user
-  app.post(`${globals.API_URI}/users`,
+  // sign a user up
+  app.post(`${globals.API_URI}/users/signup`,
     (req, res) => {
       const reqObj = req.body
       // generate salt
       var salt = security.getSalt(20)
       var hashedPW = security.hash256(reqObj.password, salt)
-      var user = [[reqObj.username, hashedPW, salt, reqObj.user_type_id]]
+      var user = [[reqObj.username, hashedPW, salt, reqObj.user_type_id, reqObj.user_email]]
       const sql =
-     'INSERT into ' + mysql.SCHEMA + mysql.User + '(' + mysql.inserts.user + ') VALUES ?'
+            'INSERT into ' + mysql.SCHEMA + mysql.User + '(' + mysql.dbColInserts.user + ') VALUES ?'
       mySqlDB.query(sql, [user], function (err) {
         if (err) {
           throw err
         } else {
-          res.status(200).json({ data: reqObj })
+          response.SUCCESS_RESP200.data = reqObj
+          res.status(200).json(response.SUCCESS_RESP200)
         }
       })
     })
 
+  // Create a user input params(username, email)
+  app.post(`${globals.API_URI}/users/create`,
+    (req, res) => {
+      const reqObj = [req.body.username, req.body.user_email]
+      console.log(reqObj)
+      // get email and check db for already existing email
+      /// 1. check user table
+      queryUtil.checkUserExistence(mySqlDB, reqObj[1], function (result) {
+        if (result) {
+          response.ERROR_RESP404.error.message = 'that email already exists'
+          res.status(404).json(response.ERROR_RESP404)
+        } else {
+          // Insert new user into newusertable
+          // const sql = 'INSERT INTO ' + mysql.SCHEMA + mysql.NewUser + ' VALUES (?,?)'
+          // mySqlDB.query(sql, [reqObj], (err, results) => {
+          //   if (err) { throw err } else {
+          // if result.alterdRows is > 0 then it is successful
+          // else check error, respond accordingly
+          //  }
+        //  })
+        }
+      })
+
+      /// 2. check new user_table
+
+      // if email exists, send user email
+      /// if email message succeeds, add to new user table
+    })
   /// /////////////////////////////////////////////////
   // R E P O R T S
   /// /////////////////////////////////////////////////
@@ -122,7 +155,8 @@ module.exports = (app, mySqlDB) => {
             queryUtil.addGroupsToReport(mySqlDB, reportGroups, function () {})
             res.status(200).json({ data: reportObj })
           } else {
-            res.status(400).json({ error: 'report could not be created' })
+            response.ERROR_RESP400.message = 'report could not be created'
+            res.status(400).json(response.ERROR_RESP400)
           }
         }
       })
@@ -148,9 +182,11 @@ module.exports = (app, mySqlDB) => {
       mySqlDB.query(sql, groupName, (err, result) => {
         if (err) { throw err } else {
           if (result.affectedRows > 0) {
-            res.status(200).json({ data: groupObj })
+            response.SUCCESS_RESP200.data = groupObj
+            res.status(200).json(response.SUCCESS_RESP200)
           } else {
-            res.status(400).json({ error: 'group could not be created' })
+            response.ERROR_RESP400.message = 'group could not be created'
+            res.status(400).json(response.ERROR_RESP400)
           }
         }
       })

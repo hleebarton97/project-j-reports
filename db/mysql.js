@@ -28,7 +28,7 @@ module.exports = {
   Reportgroup: 'report_group',
   dbColInserts: {
     datasource: 'Name, URL, Username, Password',
-    user: 'Username, Password, Password_salt, User_type_id',
+    user: 'Username, Password, Password_salt, User_type_id, Email',
     report: 'Title, Query, Description, Metadata, connection_ID',
     group: 'Name'
   }
