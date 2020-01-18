@@ -10,17 +10,11 @@
 const globals = require('../util/globals.js')
 const mysql = require('../util/mysql.js')
 
-// get mysql connection object
-const mySqlDB = mysql.createConnection()
-mySqlDB.connect(err => {
-  if (err) { throw err } else { console.log('My SQL Connected.....') }
-})
-
 /// /////////////////////////////////////////////////
 // D E L E T E   E N D P O I N T S   D E F I N I T I O N
 /// /////////////////////////////////////////////////
 
-module.exports = app => {
+module.exports = (app, mySqlDB) => {
   /// /////////////////////////////////////////////////
   // D A T A S O U R C E S
   /// /////////////////////////////////////////////////

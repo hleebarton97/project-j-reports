@@ -25,5 +25,5 @@ yarn-error.log*
 
 debug.log
 .vscode
-/.util.mysql.js
-mysql.js
+
+keyz.js
