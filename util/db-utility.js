@@ -39,9 +39,9 @@ module.exports = {
 
   // get all groups for a group of users
   addGroupsToReport: (mySqlDB, report, callback) => {
-    var pending = report.groupID.length
-    var reportID = report.id
-    var groupIDs = report.groupID
+    let pending = report.groupID.length
+    const reportID = report.id
+    const groupIDs = report.groupID
 
     for (let i = 0; i < pending; i++) {
       const sql = 'CALL ' + mysql.SCHEMA + 'addGroupsToReport(' + reportID + ', ' + groupIDs[i] + ');'
@@ -55,5 +55,22 @@ module.exports = {
         }
       })
     }
+  },
+
+  checkUserExistence: (mySqlDB, userEmail, callback) => {
+    let exists
+    const sql = 'SELECT EXISTS(SELECT * from ' + mysql.SCHEMA + mysql.User + ' WHERE Email = ?) AS \'exists\''
+    mySqlDB.query(sql, userEmail, (err, results) => {
+      if (err) { throw err } else {
+        if (results[0].exists === 1) {
+          exists = true
+        } else {
+          exists = false
+        }
+        callback(exists)
+      }
+    })
+
+    return true
   }
 }
