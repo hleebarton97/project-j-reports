@@ -28,3 +28,6 @@ debug.log
 
 # secure db config info
 keyz.js
+
+# text editor formatter
+.prettierrc

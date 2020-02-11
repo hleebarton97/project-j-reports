@@ -26,7 +26,7 @@ module.exports = {
   Group: 'group',
   Usergroup: 'user_group',
   Reportgroup: 'report_group',
-  dbColInserts: {
+  tableColumns: {
     datasource: 'Name, URL, Username, Password',
     user: 'Username, Password, Password_salt, User_type_id, Email',
     report: 'Title, Query, Description, Metadata, connection_ID',
