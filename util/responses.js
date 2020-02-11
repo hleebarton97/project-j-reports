@@ -1,21 +1,37 @@
 /// /////////////////////////////////////////////////
 /// RESPONSE OBJECT DECLARATIONS
 /// ////////////////////////////////////////////////
-const deletedRespOK = {
+const failResponse = {
+  error: {
+    message: '',
+    status_code: ''
+  }
+}
+
+const successResponse = {
+  data: {}
+}
+
+const deleteRespOK = {
   data: {
     message: ''
   }
 }
 
-const deletedRespNotFound = {
+const deleteRespIdFail = {
   error: {
-    id: '',
-    message: ''
+    message: {
+      id: ''
+    },
+    status_code: ''
   }
 }
 
-module.exports = {
+/// /////////////////////////////////////////////////
+/// RESPONSE OBJECT PROPERTY DEFINITIONS & METHODS
+/// ////////////////////////////////////////////////
 
+module.exports = {
   // HTTP RESPONSE CODES
   SUCCESS: {
     OK: 200,
@@ -26,8 +42,10 @@ module.exports = {
 
   ERROR: {
     BAD_REQUEST: 400,
+    UNAUTH: 401,
     FORBIDDEN: 403,
     NOT_FOUND: 404,
+    NOT_ALLOWED: 405,
     UNPROCESS: 422
   },
 
@@ -36,14 +54,28 @@ module.exports = {
   },
 
   // response method definitions
-  getDeletedResponse: (type, id, result) => {
-    if (result === 200) {
-      deletedRespOK.data.message = type + ' deleted'
-      return deletedRespOK
-    } else if (result === 404) {
-      deletedRespNotFound.error.id = id
-      deletedRespNotFound.error.message = type + ' not found'
-      return deletedRespNotFound
-    }
+
+  // response body for delete request methods
+  getDeletedRespSuccess: type => {
+    deleteRespOK.data.message = type + ' deleted'
+    return deletedRespOK
+  },
+
+  getDeletedRespFail: (id, code) => {
+    deleteRespIdFail.error.message.id = '{' + id + '} is not valid record in database'
+    deleteRespIdFail.error.status_code = code
+    return deleteRespIdFail
+  },
+
+  // response body for post request methods
+  getPostRespSuccess: postObj => {
+    successResponse.data = postObj
+    return successResponse
+  },
+
+  getPostRespFail: (code, message) => {
+    failResponse.error.message = message
+    failResponse.error.status_code = code
+    return failResponse
   }
 }
