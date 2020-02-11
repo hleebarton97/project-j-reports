@@ -34,7 +34,7 @@ module.exports = (app, mySqlDB) => {
   // Delete a datasource by id
   app.delete(`${globals.API_URI}/datasources/:id`, (req, res) => {
     const datasourceId = req.params.id
-    
+
     const sql =
       'DELETE FROM ' + mysql.SCHEMA + mysql.Datasource + ' WHERE ID = ?'
     mySqlDB.query(sql, datasourceId, (err, result) => {

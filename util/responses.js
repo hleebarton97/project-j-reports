@@ -58,7 +58,7 @@ module.exports = {
   // response body for delete request methods
   getDeletedRespSuccess: type => {
     deleteRespOK.data.message = type + ' deleted'
-    return deletedRespOK
+    return deleteRespOK
   },
 
   getDeletedRespFail: (id, code) => {
