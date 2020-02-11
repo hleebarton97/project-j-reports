@@ -193,7 +193,7 @@ module.exports = (app, mySqlDB) => {
         res.status(response.ERROR.NOT_ALLOWED).json(responseObj)
       } else {
         if (result.affectedRows > 0) {
-          responseObj = response.getPostRespSuccess(reportObj)
+          responseObj = response.getPostRespSuccess(groupObj)
           res.status(response.SUCCESS.CREATED).json(responseObj)
         } else {
           responseObj = response.getPostRespFail(response.SERVER_ERROR.INTERNAL, MSG.SERV_ERR)
