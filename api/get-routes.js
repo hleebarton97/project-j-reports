@@ -8,6 +8,8 @@
 // Custom file imports
 const globals = require('../util/globals.js')
 const mysql = require('../db/mysql.js')
+const queryUtil = require('../util/db-utility.js')
+const response = require('../util/responses')
 /// /////////////////////////////////////////////////
 // G L O B A L   V A R I A B L E S
 /// /////////////////////////////////////////////////
@@ -20,16 +22,22 @@ module.exports = (app, mySqlDB) => {
   /// /////////////////////////////////////////////////
   // D A T A S O U R C E S
   /// /////////////////////////////////////////////////
-
+  let responseObj = {}
   // Get all datasources
   app.get(`${globals.API_URI}/datasources`, (req, res) => {
     const sql = 'SELECT * FROM ' + mysql.SCHEMA + mysql.Datasource
     mySqlDB.query(sql, (err, result) => {
-      if (err) { throw err } else {
+      if (err) {
+        responseObj = response.getRespFail(response.ERROR.NOT_ALLOWED, err.sqlMessage)
+        res.status(response.ERROR.NOT_ALLOWED).json(responseObj)
+      } else {
         if (result.length > 0) {
-          res.status(200).json({ data: result })
-        } else {
-          res.status(404).json({ data: 'no datsources found' })
+          responseObj = response.getRespSuccess(result)
+          res.status(response.SUCCESS.OK).json(responseObj)
+        } else if (result.length === 0) {
+          // empty table
+          responseObj = response.getRespSuccess(result)
+          res.status(response.SUCCESS.OK).json(responseObj)
         }
       }
     })
@@ -41,13 +49,17 @@ module.exports = (app, mySqlDB) => {
     const sql = 'SELECT * FROM ' + mysql.SCHEMA + mysql.Datasource + ' WHERE ID = ?'
     mySqlDB.query(sql, datasourceID, function (err, result) {
       if (err) {
-        throw err
+        responseObj = response.getRespFail(response.ERROR.NOT_ALLOWED, err.sqlMessage)
+        res.status(response.ERROR.NOT_ALLOWED).json(responseObj)
       } else {
         if (result.length > 0) {
           var datasourceObj = result[0]
-          res.status(200).json({ data: datasourceObj })
-        } else {
-          res.status(404).json({ data: 'datasource not found' })
+          responseObj = response.getRespSuccess(datasourceObj)
+          res.status(response.SUCCESS.OK).json(responseObj)
+        } else if (result.length === 0) {
+          // id not found in table
+          responseObj = response.getRespFailID(datasourceID, response.ERROR.NOT_FOUND)
+          res.status(response.ERROR.NOT_FOUND).json(responseObj)
         }
       }
     })
@@ -58,7 +70,34 @@ module.exports = (app, mySqlDB) => {
   /// /////////////////////////////////////////////////
 
   // Get all users
-  app.get(`${globals.API_URI}/users`, (req, res) => {})
+  app.get(`${globals.API_URI}/users`, (req, res) => {
+    var userArr = []
+    const sql = 'SELECT * FROM ' + mysql.SCHEMA + mysql.User
+    mySqlDB.query(sql, function (err, result) {
+      if (err) {
+        responseObj = response.getRespFail(response.ERROR.NOT_ALLOWED, err.sqlMessage)
+        res.status(response.ERROR.NOT_ALLOWED).json(responseObj)
+      } else {
+        if (result.length > 0) {
+          for (var i in result) {
+            userArr.push({
+              id: result[i].ID,
+              username: result[i].Username,
+              user_type_id: result[i].User_type_id
+            })
+          }
+          queryUtil.getGroups(mySqlDB, userArr, 0, function () {
+            responseObj = response.getRespSuccess(userArr)
+            res.status(response.SUCCESS.OK).json(responseObj)
+          })
+        } else if (result.length === 0) {
+          // empty table
+          responseObj = response.getRespSuccess(userArr)
+          res.status(response.SUCCESS.OK).json(responseObj)
+        }
+      }
+    })
+  })
 
   // Get a user by id
   app.get(`${globals.API_URI}/users/:id`, (req, res) => {
@@ -66,21 +105,20 @@ module.exports = (app, mySqlDB) => {
     const sql = 'SELECT * FROM ' + mysql.SCHEMA + mysql.User + ' WHERE ID = ?'
     mySqlDB.query(sql, userID, function (err, result) {
       if (err) {
-        throw err
+        responseObj = response.getRespFail(response.ERROR.NOT_ALLOWED, err.sqlMessage)
+        res.status(response.ERROR.NOT_ALLOWED).json(responseObj)
       } else {
         if (result.length > 0) {
-          const sql2 =
-              'SELECT * FROM ' + mysql.SCHEMA + mysql.Usergroup + ' WHERE user_group.user_ID = ?'
+          const sql2 = 'SELECT * FROM ' + mysql.SCHEMA + mysql.Usergroup + ' WHERE user_group.user_ID = ?'
           mySqlDB.query(sql2, userID, function (err, result2) {
             if (err) throw err
             else {
               var groups = []
               for (var i = 0; i < result2.length; i++) {
-                groups.push(
-                  {
-                    id: result2[i].group_ID,
-                    name: result2[i].group_Name
-                  })
+                groups.push({
+                  id: result2[i].group_ID,
+                  name: result2[i].group_Name
+                })
               }
               var userObj = {
                 id: result[0].ID,
@@ -88,11 +126,14 @@ module.exports = (app, mySqlDB) => {
                 user_type_id: result[0].User_type_id,
                 groups: groups
               }
-              res.status(200).json({ data: userObj })
+              responseObj = response.getRespSuccess(userObj)
+              res.status(response.SUCCESS.OK).json(responseObj)
             }
           })
-        } else {
-          res.status(404).json({ data: 'user not found' })
+        } else if (result.length === 0) {
+          // id not found in table
+          responseObj = response.getRespFailID(userID, response.ERROR.NOT_FOUND)
+          res.status(response.ERROR.NOT_FOUND).json(responseObj)
         }
       }
     })
@@ -103,11 +144,79 @@ module.exports = (app, mySqlDB) => {
   /// /////////////////////////////////////////////////
 
   // Get all reports
-  app.get(`${globals.API_URI}/reports`, (req, res) => {})
+  app.get(`${globals.API_URI}/reports`, (req, res) => {
+    var reportArr = []
+    const sql = 'SELECT * FROM ' + mysql.SCHEMA + mysql.Report
+    mySqlDB.query(sql, (err, result) => {
+      if (err) {
+        responseObj = response.getRespFail(response.ERROR.NOT_ALLOWED, err.sqlMessage)
+        res.status(response.ERROR.NOT_ALLOWED).json(responseObj)
+      } else {
+        if (result.length > 0) {
+          for (var i in result) {
+            reportArr.push({
+              id: result[i].ID,
+              title: result[i].Title,
+              desc: result[i].Description,
+              query_string: result[i].Query,
+              datasource_id: result[i].connection_ID,
+              result_metadata: JSON.parse(result[i].Metadata)
+            })
+          }
+          queryUtil.getGroups(mySqlDB, reportArr, 1, function () {
+            responseObj = response.getRespSuccess(reportArr)
+            res.status(response.SUCCESS.OK).json(responseObj)
+          })
+        } else if (result.length === 0) {
+          responseObj = response.getRespSuccess(reportArr)
+          res.status(response.SUCCESS.OK).json(responseObj)
+        }
+      }
+    })
+  })
 
   // Get all reports by user id
   app.get(`${globals.API_URI}/reports/:id`, (req, res) => {
-    // let reportId = req.params.id
+    var reportID = req.params.id
+    const sql = 'SELECT * FROM ' + mysql.SCHEMA + mysql.Report + ' WHERE ID = ?'
+    mySqlDB.query(sql, reportID, (err, result) => {
+      if (err) {
+        responseObj = response.getRespFail(response.ERROR.NOT_ALLOWED, err.sqlMessage)
+        res.status(response.ERROR.NOT_ALLOWED).json(responseObj)
+      } else {
+        if (result.length > 0) {
+          const sql2 = 'SELECT * FROM ' + mysql.SCHEMA + mysql.Reportgroup + ' WHERE report_group.report_ID = ?'
+          mySqlDB.query(sql2, reportID, function (err, result2) {
+            if (err) {
+              throw err
+            } else {
+              var groups = []
+              for (var i = 0; i < result2.length; i++) {
+                groups.push({
+                  id: result2[i].group_ID,
+                  name: result2[i].group_Name
+                })
+              }
+              var reportObj = {
+                id: result[0].ID,
+                title: result[0].Title,
+                desc: result[0].Description,
+                query_string: result[0].Query,
+                datasource_id: result[0].connection_ID,
+                result_metadata: JSON.parse(result[0].Metadata),
+                groups: groups
+              }
+              responseObj = response.getRespSuccess(reportObj)
+              res.status(response.SUCCESS.OK).json(responseObj)
+            }
+          })
+        } else if (result.length === 0) {
+          // id not found in table
+          responseObj = response.getRespFailID(reportID, response.ERROR.NOT_FOUND)
+          res.status(response.ERROR.NOT_FOUND).json(responseObj)
+        }
+      }
+    })
   })
 
   /// /////////////////////////////////////////////////
@@ -118,16 +227,41 @@ module.exports = (app, mySqlDB) => {
   app.get(`${globals.API_URI}/groups`, (req, res) => {
     const sql = 'SELECT * FROM ' + mysql.SCHEMA + mysql.Group
     mySqlDB.query(sql, (err, result) => {
-      if (err) throw err
-      else {
-        if (result.length > 0) res.status(200).json({ data: result })
-        else res.status(404).json({ data: 'No groups found' })
+      if (err) {
+        responseObj = response.getRespFail(response.ERROR.NOT_ALLOWED, err.sqlMessage)
+        res.status(response.ERROR.NOT_ALLOWED).json(responseObj)
+      } else {
+        if (result.length > 0) {
+          responseObj = response.getRespSuccess(result)
+          res.status(response.SUCCESS.OK).json(responseObj)
+        } else if (result.length === 0) {
+          // empty table
+          responseObj = response.getRespSuccess(result)
+          res.status(response.SUCCESS.OK).json(responseObj)
+        }
       }
     })
   })
 
   // Get a group by id
   app.get(`${globals.API_URI}/groups/:id`, (req, res) => {
-    // let groupId = req.params.id
+    var groupId = req.params.id
+    const sql = 'SELECT * FROM ' + mysql.SCHEMA + mysql.Group + ' WHERE ID = ?'
+    mySqlDB.query(sql, groupId, (err, result) => {
+      if (err) {
+        responseObj = response.getRespFail(response.ERROR.NOT_ALLOWED, err.sqlMessage)
+        res.status(response.ERROR.NOT_ALLOWED).json(responseObj)
+      } else {
+        if (result.length > 0) {
+          responseObj = response.getRespSuccess(result)
+          res.status(response.SUCCESS.OK).json(responseObj)
+        }
+        else if (result.length === 0) {
+          // id not found in table
+          responseObj = response.getRespFailID(groupId, response.ERROR.NOT_FOUND)
+          res.status(response.ERROR.NOT_FOUND).json(responseObj)
+        }
+      }
+    })
   })
 }

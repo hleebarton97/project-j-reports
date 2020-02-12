@@ -53,7 +53,7 @@ module.exports = {
     INTERNAL: 500
   },
 
-  // response method definitions
+  // RESPONSE METHOD DEFINITIONS
 
   // response body for delete request methods
   getDeletedRespSuccess: type => {
@@ -67,6 +67,12 @@ module.exports = {
     return deleteRespIdFail
   },
 
+  getRespFailID: (id, code) => {
+    deleteRespIdFail.error.message.id = '{' + id + '} is not valid record in database'
+    deleteRespIdFail.error.status_code = code
+    return deleteRespIdFail
+  },
+
   // response body for post request methods
   getPostRespSuccess: postObj => {
     successResponse.data = postObj
@@ -74,6 +80,17 @@ module.exports = {
   },
 
   getPostRespFail: (code, message) => {
+    failResponse.error.message = message
+    failResponse.error.status_code = code
+    return failResponse
+  },
+
+  getRespSuccess: obj => {
+    successResponse.data = obj
+    return successResponse
+  },
+  
+  getRespFail: (code, message) => {
     failResponse.error.message = message
     failResponse.error.status_code = code
     return failResponse
