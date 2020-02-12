@@ -255,8 +255,7 @@ module.exports = (app, mySqlDB) => {
         if (result.length > 0) {
           responseObj = response.getRespSuccess(result)
           res.status(response.SUCCESS.OK).json(responseObj)
-        }
-        else if (result.length === 0) {
+        } else if (result.length === 0) {
           // id not found in table
           responseObj = response.getRespFailID(groupId, response.ERROR.NOT_FOUND)
           res.status(response.ERROR.NOT_FOUND).json(responseObj)

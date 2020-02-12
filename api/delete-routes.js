@@ -15,13 +15,6 @@ const mysql = require('../db/mysql')
 // G L O B A L   V A R I A B L E S
 /// /////////////////////////////////////////////////
 
-const ENTITY = {
-  DS: 'datasource',
-  USR: 'user',
-  RPT: 'report',
-  GRP: 'group'
-}
-
 /// /////////////////////////////////////////////////
 // D E L E T E   E N D P O I N T S   D E F I N I T I O N
 /// /////////////////////////////////////////////////
@@ -43,10 +36,10 @@ module.exports = (app, mySqlDB) => {
         res.status(response.ERROR.NOT_ALLOWED).json(responseObj)
       } else {
         if (result.affectedRows > 0) {
-          responseObj = response.getDeletedRespSuccess(ENTITY.DS)
+          responseObj = response.getDeletedRespSuccess(globals.DS)
           res.status(response.SUCCESS.OK).json(responseObj)
         } else if (result.affectedRows === 0) {
-          responseObj = response.getDeletedRespFail(datasourceId, response.ERROR.NOT_FOUND)
+          responseObj = response.getRespFailID(datasourceId, response.ERROR.NOT_FOUND)
           res.status(response.ERROR.NOT_FOUND).json(responseObj)
         }
       }
@@ -67,10 +60,10 @@ module.exports = (app, mySqlDB) => {
         res.status(response.ERROR.NOT_ALLOWED).json(responseObj)
       } else {
         if (result.affectedRows > 0) {
-          responseObj = response.getDeletedRespSuccess(ENTITY.USR)
+          responseObj = response.getDeletedRespSuccess(globals.USR)
           res.status(response.SUCCESS.OK).json(responseObj)
         } else if (result.affectedRows === 0) {
-          responseObj = response.getDeletedRespFail(userID, response.ERROR.NOT_FOUND)
+          responseObj = response.getRespFailID(userID, response.ERROR.NOT_FOUND)
           res.status(response.ERROR.NOT_FOUND).json(responseObj)
         }
       }
@@ -91,10 +84,10 @@ module.exports = (app, mySqlDB) => {
         res.status(response.ERROR.NOT_ALLOWED).json(responseObj)
       } else {
         if (result.affectedRows > 0) {
-          responseObj = response.getDeletedRespSuccess(ENTITY.RPT)
+          responseObj = response.getDeletedRespSuccess(globals.RPT)
           res.status(response.SUCCESS.OK).json(responseObj)
         } else if (result.affectedRows === 0) {
-          responseObj = response.getDeletedRespFail(reportID, response.ERROR.NOT_FOUND)
+          responseObj = response.getRespFailID(reportID, response.ERROR.NOT_FOUND)
           res.status(response.ERROR.NOT_FOUND).json(responseObj)
         }
       }
@@ -115,10 +108,10 @@ module.exports = (app, mySqlDB) => {
         res.status(response.ERROR.NOT_ALLOWED).json(responseObj)
       } else {
         if (result.affectedRows > 0) {
-          responseObj = response.getDeletedRespSuccess(ENTITY.GRP)
+          responseObj = response.getDeletedRespSuccess(globals.GRP)
           res.status(response.SUCCESS.OK).json(responseObj)
         } else if (result.affectedRows === 0) {
-          responseObj = response.getDeletedRespFail(groupID, response.ERROR.NOT_FOUND)
+          responseObj = response.getRespFailID(groupID, response.ERROR.NOT_FOUND)
           res.status(response.ERROR.NOT_FOUND).json(responseObj)
         }
       }

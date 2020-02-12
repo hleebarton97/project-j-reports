@@ -38,14 +38,14 @@ module.exports = (app, mySqlDB) => {
       'INSERT INTO ' + mysql.SCHEMA + mysql.Datasource + ' (' + mysql.tableColumns.datasource + ') VALUES(?,?,?,?)'
     mySqlDB.query(sql, datasource, (err, result) => {
       if (err) {
-        responseObj = response.getPostRespFail(response.ERROR.NOT_ALLOWED, err.sqlMessage)
+        responseObj = response.getRespFail(response.ERROR.NOT_ALLOWED, err.sqlMessage)
         res.status(response.ERROR.NOT_ALLOWED).json(responseObj)
       } else {
         if (result.affectedRows > 0) {
-          responseObj = response.getPostRespSuccess(dsObj)
+          responseObj = response.getRespSuccess(dsObj)
           res.status(response.SUCCESS.CREATED).json(responseObj)
         } else {
-          responseObj = response.getPostRespFail(response.SERVER_ERROR.INTERNAL, MSG.SERV_ERR)
+          responseObj = response.getRespFail(response.SERVER_ERROR.INTERNAL, MSG.SERV_ERR)
           res.status(response.SERVER_ERROR.INTERNAL).json(responseObj)
         }
       }
@@ -62,7 +62,7 @@ module.exports = (app, mySqlDB) => {
     const sql = 'SELECT * FROM ' + mysql.SCHEMA + mysql.User + ' WHERE user.Username = ?'
     mySqlDB.query(sql, reqObj.username, function (err, result) {
       if (err) {
-        responseObj = response.getPostRespFail(response.ERROR.NOT_ALLOWED, err.sqlMessage)
+        responseObj = response.getRespFail(response.ERROR.NOT_ALLOWED, err.sqlMessage)
         res.status(response.ERROR.NOT_ALLOWED).json(responseObj)
       } else {
         if (result.length > 0) {
@@ -73,16 +73,16 @@ module.exports = (app, mySqlDB) => {
             user_type_id: result[0].User_type_id
           }
           if (loginSaltnHash === savedPass) {
-            responseObj = response.getPostRespSuccess(userObj)
+            responseObj = response.getRespSuccess(userObj)
             res.status(response.SUCCESS.OK).json(responseObj)
           } else {
             // password invalid
-            responseObj = response.getPostRespFail(response.ERROR.UNAUTH, MSG.LOGIN_FAIL)
+            responseObj = response.getRespFail(response.ERROR.UNAUTH, MSG.LOGIN_FAIL)
             res.status(response.ERROR.UNAUTH).json(responseObj)
           }
         } else {
           // username does not exist
-          responseObj = response.getPostRespFail(response.ERROR.UNAUTH, MSG.LOGIN_FAIL)
+          responseObj = response.getRespFail(response.ERROR.UNAUTH, MSG.LOGIN_FAIL)
           res.status(response.ERROR.UNAUTH).json(responseObj)
         }
       }
@@ -115,7 +115,7 @@ module.exports = (app, mySqlDB) => {
     /// 1. check user table
     queryUtil.checkUserExistence(mySqlDB, reqObj[1], function (result) {
       if (result) {
-        responseObj = response.getPostRespFail(response.ERROR.FORBIDDEN, MSG.EMAIL_EXIST)
+        responseObj = response.getRespFail(response.ERROR.FORBIDDEN, MSG.EMAIL_EXIST)
         res.status(response.ERROR.FORBIDDEN).json(responseObj)
       } else {
         // Insert new user into newusertable
@@ -156,7 +156,7 @@ module.exports = (app, mySqlDB) => {
     const sql = 'INSERT INTO ' + mysql.SCHEMA + mysql.Report + ' (' + mysql.tableColumns.report + ') VALUES (?,?,?,?,?)'
     mySqlDB.query(sql, report, (err, result) => {
       if (err) {
-        responseObj = response.getPostRespFail(response.ERROR.NOT_ALLOWED, err.sqlMessage)
+        responseObj = response.getRespFail(response.ERROR.NOT_ALLOWED, err.sqlMessage)
         res.status(response.ERROR.NOT_ALLOWED).json(responseObj)
       } else {
         if (result.affectedRows > 0) {
@@ -165,10 +165,10 @@ module.exports = (app, mySqlDB) => {
             groupID: groups
           }
           queryUtil.addGroupsToReport(mySqlDB, reportGroups, function () {})
-          responseObj = response.getPostRespSuccess(reportObj)
+          responseObj = response.getRespSuccess(reportObj)
           res.status(response.SUCCESS.CREATED).json(responseObj)
         } else {
-          responseObj = response.getPostRespFail(response.SERVER_ERROR.INTERNAL, MSG.SERV_ERR)
+          responseObj = response.getRespFail(response.SERVER_ERROR.INTERNAL, MSG.SERV_ERR)
           res.status(response.SERVER_ERROR.INTERNAL).json(responseObj)
         }
       }
@@ -189,14 +189,14 @@ module.exports = (app, mySqlDB) => {
     const sql = 'INSERT INTO ' + mysql.SCHEMA + mysql.Group + ' (' + mysql.tableColumns.group + ') VALUES (?)'
     mySqlDB.query(sql, groupName, (err, result) => {
       if (err) {
-        responseObj = response.getPostRespFail(response.ERROR.NOT_ALLOWED, err.sqlMessage)
+        responseObj = response.getRespFail(response.ERROR.NOT_ALLOWED, err.sqlMessage)
         res.status(response.ERROR.NOT_ALLOWED).json(responseObj)
       } else {
         if (result.affectedRows > 0) {
-          responseObj = response.getPostRespSuccess(groupObj)
+          responseObj = response.getRespSuccess(groupObj)
           res.status(response.SUCCESS.CREATED).json(responseObj)
         } else {
-          responseObj = response.getPostRespFail(response.SERVER_ERROR.INTERNAL, MSG.SERV_ERR)
+          responseObj = response.getRespFail(response.SERVER_ERROR.INTERNAL, MSG.SERV_ERR)
           res.status(response.SERVER_ERROR.INTERNAL).json(responseObj)
         }
       }

@@ -55,16 +55,10 @@ module.exports = {
 
   // RESPONSE METHOD DEFINITIONS
 
-  // response body for delete request methods
+  // methods to construct response body to API specs
   getDeletedRespSuccess: type => {
     deleteRespOK.data.message = type + ' deleted'
     return deleteRespOK
-  },
-
-  getDeletedRespFail: (id, code) => {
-    deleteRespIdFail.error.message.id = '{' + id + '} is not valid record in database'
-    deleteRespIdFail.error.status_code = code
-    return deleteRespIdFail
   },
 
   getRespFailID: (id, code) => {
@@ -73,23 +67,11 @@ module.exports = {
     return deleteRespIdFail
   },
 
-  // response body for post request methods
-  getPostRespSuccess: postObj => {
-    successResponse.data = postObj
-    return successResponse
-  },
-
-  getPostRespFail: (code, message) => {
-    failResponse.error.message = message
-    failResponse.error.status_code = code
-    return failResponse
-  },
-
   getRespSuccess: obj => {
     successResponse.data = obj
     return successResponse
   },
-  
+
   getRespFail: (code, message) => {
     failResponse.error.message = message
     failResponse.error.status_code = code
