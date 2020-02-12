@@ -4,12 +4,12 @@ const crypto = require('crypto')
 module.exports = {
   // SHA-256 hashing function
   hash256: (loginAttempt, savedSalt) => {
-  // Using SHA-256 hashing algorithm
+    // Using SHA-256 hashing algorithm
     return hash(loginAttempt + savedSalt)
   },
 
   // generate random salt
-  getSalt: (length) => {
+  getSalt: length => {
     return crypto
       .randomBytes(Math.ceil(length / 2))
       .toString('ascii') // convert to hexadecimal format
