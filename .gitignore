@@ -25,3 +25,9 @@ yarn-error.log*
 
 debug.log
 .vscode
+
+# secure db config info
+keyz.js
+
+# text editor formatter
+.prettierrc
